@@ -1,172 +1,255 @@
 openapi: 3.1.0
 info:
-  title: Pet Matchmaker
+  title: Tea Subscription
   description: |-
-    Pet Matchmaker Backend API
+    Tea Subscription Backend API
   version: 1.0.0
 servers:
-  - url: https://pet-matchmaker-api-da76dbdc99ce.herokuapp.com/api/v1
+  - url: http://localhost:3000/api/v1
 tags:
-  - name: user
-  - name: questions
-  - name: questionnaire submissions
-  - name: petfinder animals
+  - name: subscriptions
+  - name: customer subscriptions
 paths:
-  /users:
+  /subscriptions:
     get:
       tags:
-        - user
-      summary: Get a user
-      description: Search for a user by username
+        - subscriptions
+      summary: Get all subscriptions
+      description: Get all subscriptions with the option to sort by price
       parameters:
         - in: query
-          name: username
+          name: sort_by_price
           schema:
             type: string
-            examples: [something_unique]
-          required: true
-          description: The username to login
+            examples: [asc, desc]
+          required: false
+          description: Sort subscriptions by price, either ascending or descending
       responses:
         "200":
           description: Successful request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples: [1]
+                        type:
+                          type: string
+                          examples: [subscription]
+                        attributes:
+                          type: object
+                          properties:
+                            title:
+                              type: string
+                              examples: [commodi]
+                            price:
+                              type: number
+                              examples: [83.12]
+                            image_url:
+                              type: string
+                              examples: [https://loremflickr.com/300/300]
+                        relationships:
+                          type: object
         "422":
-          description: Non-existent user or missing username
+          description: Invalid sort_by_price value
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
-    post:
-      tags:
-        - user
-      summary: Create a new user.
-      description: Create a new user with a unique username.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateUser"
-        required: true
-      responses:
-        "201":
-          description: Successful creation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        "422":
-          description: Non-unique username or missing username
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-  /questions:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    examples: [Value of sort_by_price must be 'asc' or 'desc']
+                  status:
+                    type: integer
+                    examples: [422]
+  /subscriptions/{id}:
     get:
       tags:
-        - questions
-      summary: Fetch all questions.
-      description: Fetch all questions and their respective answers.
-      responses:
-        "200":
-          description: Successful request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Questions"
-  /users/{user_id}/questionnaire_submissions:
-    get:
-      tags:
-        - questionnaire submissions
-      summary: Fetch all submissions for a user
-      description: Fetch all questionnaire submissions for a given user
+        - subscriptions
+      summary: Get detailed subscription info
+      description: Get a detailed subscription including associated teas and customer subscriptions
       parameters:
-        - in: path
-          name: user_id
-          required: true
-          schema:
-            type: integer
-            minimum: 1
-          description: The user ID
-      responses:
-        "200":
-          description: Successful request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/QuestionnaireSubmissions"
-        "404":
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-    post:
-      tags:
-        - questionnaire submissions
-      summary: Submit a user questionnaire
-      description: Submit a user questionnaire with their answer ids, get a recommended animal in return!
-      parameters:
-        - in: path
-          name: user_id
-          required: true
-          schema:
-            type: integer
-            minimum: 1
-          description: The user ID
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SubmitQuestionnaire"
-        required: true
-      responses:
-        "201":
-          description: Successful creation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/QuestionnaireSubmission"
-        "404":
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        "422":
-          description: Invalid or missing answer_ids
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-  /users/{user_id}/questionnaire_submissions/{id}:
-    patch:
-      tags:
-        - questionnaire submissions
-      summary: Save a questionnaire submission
-      description: Save a questionnaire submission for a given user
-      parameters:
-        - in: path
-          name: user_id
-          required: true
-          schema:
-            type: integer
-            minimum: 1
-          description: The user ID
         - in: path
           name: id
           required: true
           schema:
             type: integer
             minimum: 1
-          description: The questionnaire submission ID
+          description: The subscription id
+      responses:
+        "200":
+          description: Successful request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        examples: [1]
+                      type:
+                        type: string
+                        examples: [subscription]
+                      attributes:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                            examples: [commodi]
+                          price:
+                            type: number
+                            examples: [83.12]
+                          image_url:
+                            type: string
+                            examples: [https://loremflickr.com/300/300]
+                          customer_subscriptions:
+                            type: object
+                            properties:
+                              data:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      examples: [1]
+                                    type:
+                                      type: string
+                                      examples: [customer_subscription]
+                                    attributes:
+                                      type: object
+                                      properties:
+                                        status:
+                                          type: string
+                                          examples: [active, inactive]
+                                        customer:
+                                          type: object
+                                          properties:
+                                            data:
+                                              type: object
+                                              properties:
+                                                id:
+                                                  type: string
+                                                  examples: [1]
+                                                type:
+                                                  type: string
+                                                  examples: [customer]
+                                                attributes:
+                                                  type: object
+                                                  properties:
+                                                    first_name:
+                                                      type: string
+                                                      examples: [Kaley]
+                                                    last_name:
+                                                      type: string
+                                                      examples: [Hand]
+                                                    email:
+                                                      type: string
+                                                      examples:
+                                                        [
+                                                          melina@terry-stamm.example,
+                                                        ]
+                                                    address:
+                                                      type: string
+                                                      examples:
+                                                        [
+                                                          33343 Solomon Ridge,
+                                                          Hyattchester,
+                                                          CO 36994-5015,
+                                                        ]
+                      relationships:
+                        type: object
+                        properties:
+                          teas:
+                            type: object
+                            properties:
+                              data:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      examples: [1]
+                                    type:
+                                      type: string
+                                      examples: [tea]
+                  included:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          examples: [1]
+                        type:
+                          type: string
+                          examples: [tea]
+                        attributes:
+                          type: object
+                          properties:
+                            title:
+                              type: string
+                              examples: [Dianhong]
+                            description:
+                              type: string
+                              examples:
+                                [
+                                  Et sequi blanditiis. Et ut sed. Magni consectetur vel.,
+                                ]
+                            brew_time:
+                              type: integer
+                              examples: [5]
+                            image_url:
+                              type: string
+                              examples: [https://loremflickr.com/300/300]
+        "404":
+          description: Invalid subscription id
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    examples: [Couldn't find Subscription with 'id'=-1]
+                  status:
+                    type: integer
+                    examples: [404]
+  /customer_subscriptions/{id}/:
+    patch:
+      tags:
+        - customer subscriptions
+      summary: Activate or cancel a customer subscription
+      description: Activate or cancel a customer subscription
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: The customer subscription id
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SaveQuestionnaire"
+              type: object
+              properties:
+                active:
+                  type: string
+                  examples: [true, false]
         required: true
       responses:
         "200":
@@ -174,278 +257,50 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/QuestionnaireSubmission"
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        examples: [1]
+                      type:
+                        type: string
+                        examples: [customer_subscription]
+                      attributes:
+                        type: object
+                        properties:
+                          status:
+                            type: string
+                            examples: [active, inactive]
         "404":
-          description: User or Questionnaire Submission not found
+          description: Invalid customer subscription id
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                type: object
+                properties:
+                  message:
+                    type: string
+                    examples: [Couldn't find CustomerSubscription with 'id'=-1]
+                  status:
+                    type: integer
+                    examples: [404]
         "422":
-          description: Invalid or missing answer_ids
+          description: Invalid or missing active value
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
-  /petfinder_animals:
-    get:
-      tags:
-        - petfinder animals
-      summary: Fetch animals from Petfinder API
-      description: Fetch specific animals from the Petfinder API near the user's zipcode
-      parameters:
-        - in: query
-          name: zipcode
-          schema:
-            type: string
-            examples: [07097]
-          required: true
-          description: The user's zipcode to login
-        - in: query
-          name: recommended_animal_id
-          schema:
-            type: string
-            examples: [1]
-          required: true
-          description: The recommended animal id
-      responses:
-        "200":
-          description: Successful request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PetfinderAnimals"
-        "422":
-          description: Invalid or missing zipcode or animal id
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-components:
-  schemas:
-    User:
-      type: object
-      properties:
-        data:
-          type: object
-          properties:
-            type:
-              type: string
-              examples: [user]
-            id:
-              type: string
-              examples: [1]
-            attributes:
-              type: object
-              properties:
-                username:
-                  type: string
-                  examples: [something_unique]
-    CreateUser:
-      type: object
-      properties:
-        username:
-          type: string
-          examples: [something_unique]
-    Questions:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/Question"
-    Question:
-      type: object
-      properties:
-        type:
-          type: string
-          examples: [question]
-        id:
-          type: string
-          examples: [1]
-        attributes:
-          type: object
-          properties:
-            text:
-              type: string
-              examples: [question?]
-            answers:
-              type: array
-              items:
-                $ref: "#/components/schemas/Answer"
-    Answer:
-      type: object
-      properties:
-        type:
-          type: string
-          examples: [answer]
-        id:
-          type: string
-          examples: [1]
-        attributes:
-          type: object
-          properties:
-            text:
-              type: string
-              examples: [answer]
-    QuestionnaireSubmissions:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/QuestionnaireSubmission"
-    QuestionnaireSubmission:
-      type: object
-      properties:
-        type:
-          type: string
-          examples: [questionnaire_submission]
-        id:
-          type: string
-          examples: [1]
-        attributes:
-          type: object
-          properties:
-            saved:
-              type: boolean
-              examples: [true, false]
-            submission_answers:
-              type: array
-              items:
-                $ref: "#/components/schemas/SubmissionAnswer"
-            recommended_animal:
-              type: object
-              properties:
-                type:
-                  type: string
-                  examples: [recommended_animal]
-                id:
-                  type: string
-                  examples: [1]
-                attributes:
-                  type: object
-                  properties:
-                    type:
-                      type: string
-                      examples: [dachshund]
-                    photo_url:
-                      type: string
-                      examples: [https://photos.com/dachshund]
-                    description:
-                      type: string
-                      examples: [description]
-    SubmissionAnswer:
-      type: object
-      properties:
-        type:
-          type: string
-          examples: [submission_answer]
-        id:
-          type: string
-          examples: [1]
-        attributes:
-          type: object
-          properties:
-            text:
-              type: string
-              examples: [answer]
-    RecommendedAnimal:
-      type: object
-      properties:
-        type:
-          type: string
-          examples: [recommended_animal]
-        id:
-          type: string
-          examples: [1]
-        attributes:
-          type: object
-          properties:
-            animal_type:
-              type: string
-              examples: [dachshund]
-            photo_url:
-              type: string
-              examples: [https://photos.com/dachshund]
-            description:
-              type: string
-              examples: [description]
-    PetfinderAnimals:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/PetfinderAnimal"
-    PetfinderAnimal:
-      type: object
-      properties:
-        type:
-          type: string
-          examples: [petfinder_animal]
-        id:
-          type: string
-          examples: [1]
-        attributes:
-          type: object
-          properties:
-            name:
-              type: string
-              examples: [Spot]
-            photo_url:
-              type: string
-              examples:
-                [
-                  https://photos.petfinder.com/photos/pets/42706540/1/?bust=1546042081,
-                ]
-            age:
-              type: string
-              examples: [Young]
-            gender:
-              type: string
-              examples: [Male]
-            size:
-              type: string
-              examples: [Medium]
-            species:
-              type: string
-              examples: [Dog]
-            city:
-              type: string
-              examples: [Jersey City]
-            state:
-              type: string
-              examples: [NJ]
-            description:
-              type: string
-              examples: [Spot is an amazing dog]
-            email:
-              type: string
-              examples: [petfindertechsupport@gmail.com]
-    SubmitQuestionnaire:
-      type: object
-      properties:
-        answer_ids:
-          type: array
-          items:
-            type: string
-            examples: [[1, 4, 6]]
-    SaveQuestionnaire:
-      type: object
-      properties:
-        saved:
-          type: boolean
-          examples: [true]
-    Error:
-      type: object
-      properties:
-        status:
-          type: integer
-          format: int32
-          examples: [422, 400, 404]
-        message:
-          type: string
-      required:
-        - status
-        - message
+                type: object
+                properties:
+                  message:
+                    type: string
+                    examples:
+                      [
+                        Value of active must be 'true' or 'false',
+                        "param is missing or the value is empty: active",
+                      ]
+                  status:
+                    type: integer
+                    examples: [422]
